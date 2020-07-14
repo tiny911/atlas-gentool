@@ -41,11 +41,11 @@ RUN go get github.com/ghodss/yaml
 # versions of these tools, this is why we at first step install glide,
 # download required versions and then installing them.
 RUN sed -e "s/@AATVersion/$AAT_VERSION/" \
-        -e "s/@PGGVersion/$PGG_VERSION/" \
-        -e "s/@PGAQVVersion/$PGAQV_VERSION/" \
-        -e "s/@PGAVVersion/$PGAV_VERSION/" \
-        -e "s/@PGPVersion/$PGP_VERSION/" \
-        glide.yaml.tmpl > glide.yaml
+    -e "s/@PGGVersion/$PGG_VERSION/" \
+    -e "s/@PGAQVVersion/$PGAQV_VERSION/" \
+    -e "s/@PGAVVersion/$PGAV_VERSION/" \
+    -e "s/@PGPVersion/$PGP_VERSION/" \
+    glide.yaml.tmpl > glide.yaml
 RUN glide up --skip-test
 RUN cp -r vendor/* ${GOPATH}/src/
 
@@ -59,13 +59,13 @@ RUN go install github.com/gogo/protobuf/protoc-gen-gogoslick
 RUN go install github.com/gogo/protobuf/protoc-gen-gogotypes
 RUN go install github.com/gogo/protobuf/protoc-gen-gostring
 RUN go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-RUN go install github.com/lyft/protoc-gen-validate
+RUN go install github.com/envoyproxy/protoc-gen-validate
 RUN go install github.com/mwitkow/go-proto-validators/protoc-gen-govalidators
 RUN go install github.com/pseudomuto/protoc-gen-doc/cmd/...
 RUN go install github.com/infobloxopen/protoc-gen-preprocess
 RUN go install  \
-      -ldflags "-X github.com/infobloxopen/protoc-gen-gorm/plugin.ProtocGenGormVersion=$PGG_VERSION -X github.com/infobloxopen/protoc-gen-gorm/plugin.AtlasAppToolkitVersion=$AAT_VERSION" \
-      github.com/infobloxopen/protoc-gen-gorm
+    -ldflags "-X github.com/infobloxopen/protoc-gen-gorm/plugin.ProtocGenGormVersion=$PGG_VERSION -X github.com/infobloxopen/protoc-gen-gorm/plugin.AtlasAppToolkitVersion=$AAT_VERSION" \
+    github.com/infobloxopen/protoc-gen-gorm
 # Download all dependencies of protoc-gen-atlas-query-validate
 RUN cd ${GOPATH}/src/github.com/infobloxopen/protoc-gen-atlas-query-validate && dep ensure -vendor-only
 RUN go install github.com/infobloxopen/protoc-gen-atlas-query-validate
@@ -81,17 +81,17 @@ RUN rm -rf vendor/* ${GOPATH}/pkg/* \
 
 # build protoc-gen-swagger separately with atlas_patch
 RUN go get github.com/go-openapi/spec && \
-	rm -rf ${GOPATH}/src/github.com/grpc-ecosystem/ \
-	&& mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/ && \
-	cd ${GOPATH}/src/github.com/grpc-ecosystem && \
-	git clone --single-branch -b atlas-patch https://github.com/infobloxopen/grpc-gateway.git && \
-	cd grpc-gateway/protoc-gen-swagger && go build -o /out/usr/bin/protoc-gen-swagger main.go
+    rm -rf ${GOPATH}/src/github.com/grpc-ecosystem/ \
+    && mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/ && \
+    cd ${GOPATH}/src/github.com/grpc-ecosystem && \
+    git clone --single-branch -b atlas-patch https://github.com/infobloxopen/grpc-gateway.git && \
+    cd grpc-gateway/protoc-gen-swagger && go build -o /out/usr/bin/protoc-gen-swagger main.go
 
 RUN mkdir -p /out/protos && \
     find ${GOPATH}/src -name "*.proto" -exec cp --parents {} /out/protos \;
 
 RUN upx --lzma \
-        /out/usr/bin/protoc-gen-*
+    /out/usr/bin/protoc-gen-*
 
 FROM alpine:3.8
 RUN apk add --no-cache libstdc++ protobuf-dev
@@ -107,7 +107,7 @@ ENTRYPOINT ["protoc", "-I.", \
     # required import paths for protoc-gen-swagger plugin
     "-Igithub.com/grpc-ecosystem/grpc-gateway", "-Igithub.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options", \
     # required import paths for protoc-gen-validate plugin
-    "-Igithub.com/lyft/protoc-gen-validate/validate", \
+    "-Igithub.com/envoyproxy/protoc-gen-validate/validate", \
     # required import paths for go-proto-validators plugin
     "-Igithub.com/mwitkow/go-proto-validators", \
     # googleapis proto files
@@ -120,4 +120,4 @@ ENTRYPOINT ["protoc", "-I.", \
     "-Igithub.com/infobloxopen/protoc-gen-preprocess", \
     # required import paths for protoc-gen-atlas-validate plugin
     "-Igithub.com/infobloxopen/protoc-gen-atlas-validate" \
-]
+    ]
