@@ -1,5 +1,5 @@
 # The docker image to generate Golang code from Protol Buffer.
-FROM golang:1.10-alpine as builder
+FROM golang:1.14-alpine as builder
 LABEL intermediate=true
 MAINTAINER DL NGP-App-Infra-API <ngp-app-infra-api@infoblox.com>
 
@@ -41,9 +41,6 @@ RUN go get github.com/ghodss/yaml
 # versions of these tools, this is why we at first step install glide,
 # download required versions and then installing them.
 RUN sed -e "s/@AATVersion/$AAT_VERSION/" \
-    -e "s/@PGGVersion/$PGG_VERSION/" \
-    -e "s/@PGAQVVersion/$PGAQV_VERSION/" \
-    -e "s/@PGAVVersion/$PGAV_VERSION/" \
     glide.yaml.tmpl > glide.yaml
 RUN glide up --skip-test
 RUN cp -r vendor/* ${GOPATH}/src/
@@ -60,19 +57,10 @@ RUN go install github.com/gogo/protobuf/protoc-gen-gostring
 RUN go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 RUN go install github.com/mwitkow/go-proto-validators/protoc-gen-govalidators
 RUN go install github.com/pseudomuto/protoc-gen-doc/cmd/...
-RUN go install  \
-    -ldflags "-X github.com/tiny911/protoc-gen-gorm/plugin.ProtocGenGormVersion=$PGG_VERSION -X github.com/tiny911/protoc-gen-gorm/plugin.AtlasAppToolkitVersion=$AAT_VERSION" \
-    github.com/tiny911/protoc-gen-gorm
+
 
 RUN go get -d github.com/envoyproxy/protoc-gen-validate
 RUN cd ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && go install .
-# Download all dependencies of protoc-gen-atlas-query-validate
-RUN cd ${GOPATH}/src/github.com/tiny911/protoc-gen-atlas-query-validate && dep ensure -vendor-only
-RUN go install github.com/tiny911/protoc-gen-atlas-query-validate
-
-# Download all dependencies of protoc-gen-atlas-validate
-RUN cd ${GOPATH}/src/github.com/tiny911/protoc-gen-atlas-validate && dep ensure -vendor-only
-RUN go install github.com/tiny911/protoc-gen-atlas-validate
 
 RUN mkdir -p /out/usr/bin
 
@@ -112,10 +100,4 @@ ENTRYPOINT ["protoc", "-I.", \
     "-Igithub.com/mwitkow/go-proto-validators", \
     # googleapis proto files
     "-Igithub.com/googleapis/googleapis", \
-    # required import paths for protoc-gen-gorm plugin
-    "-Igithub.com/tiny911/protoc-gen-gorm", \
-    # required import paths for protoc-gen-atlas-query-validate plugin
-    "-Igithub.com/tiny911/protoc-gen-atlas-query-validate", \
-    # required import paths for protoc-gen-atlas-validate plugin
-    "-Igithub.com/tiny911/protoc-gen-atlas-validate" \
     ]

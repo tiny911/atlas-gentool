@@ -46,8 +46,6 @@ docker run --rm -v $(pwd):/go/src/${project} \
 - protoc-gen-validate
 - protoc-gen-govalidators
 - protoc-gen-doc
-- protoc-gen-gorm (**Infoblox Open**)
-- protoc-gen-atlas-query-validate (**Infoblox Open**)
 - protoc-gen-atlas-validate (**Infoblox Open**)
 
 ## protoc-gen-swagger patch
