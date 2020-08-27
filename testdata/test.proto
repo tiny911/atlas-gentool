@@ -8,7 +8,6 @@ import "protoc-gen-swagger/options/annotations.proto";
 import "github.com/infobloxopen/protoc-gen-gorm/options/gorm.proto";
 import "github.com/infobloxopen/protoc-gen-atlas-query-validate/options/query_validate.proto";
 import "github.com/infobloxopen/protoc-gen-atlas-validate/options/atlas_validate.proto";
-import "github.com/infobloxopen/protoc-gen-preprocess/options/preprocess.proto";
 
 message Example {
   option (gorm.opts).ormable = true;

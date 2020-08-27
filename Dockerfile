@@ -44,7 +44,6 @@ RUN sed -e "s/@AATVersion/$AAT_VERSION/" \
     -e "s/@PGGVersion/$PGG_VERSION/" \
     -e "s/@PGAQVVersion/$PGAQV_VERSION/" \
     -e "s/@PGAVVersion/$PGAV_VERSION/" \
-    -e "s/@PGPVersion/$PGP_VERSION/" \
     glide.yaml.tmpl > glide.yaml
 RUN glide up --skip-test
 RUN cp -r vendor/* ${GOPATH}/src/
@@ -61,20 +60,19 @@ RUN go install github.com/gogo/protobuf/protoc-gen-gostring
 RUN go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 RUN go install github.com/mwitkow/go-proto-validators/protoc-gen-govalidators
 RUN go install github.com/pseudomuto/protoc-gen-doc/cmd/...
-RUN go install github.com/infobloxopen/protoc-gen-preprocess
 RUN go install  \
-    -ldflags "-X github.com/infobloxopen/protoc-gen-gorm/plugin.ProtocGenGormVersion=$PGG_VERSION -X github.com/infobloxopen/protoc-gen-gorm/plugin.AtlasAppToolkitVersion=$AAT_VERSION" \
-    github.com/infobloxopen/protoc-gen-gorm
+    -ldflags "-X github.com/tiny911/protoc-gen-gorm/plugin.ProtocGenGormVersion=$PGG_VERSION -X github.com/tiny911/protoc-gen-gorm/plugin.AtlasAppToolkitVersion=$AAT_VERSION" \
+    github.com/tiny911/protoc-gen-gorm
 
 RUN go get -d github.com/envoyproxy/protoc-gen-validate
 RUN cd ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && go install .
 # Download all dependencies of protoc-gen-atlas-query-validate
-RUN cd ${GOPATH}/src/github.com/infobloxopen/protoc-gen-atlas-query-validate && dep ensure -vendor-only
-RUN go install github.com/infobloxopen/protoc-gen-atlas-query-validate
+RUN cd ${GOPATH}/src/github.com/tiny911/protoc-gen-atlas-query-validate && dep ensure -vendor-only
+RUN go install github.com/tiny911/protoc-gen-atlas-query-validate
 
 # Download all dependencies of protoc-gen-atlas-validate
-RUN cd ${GOPATH}/src/github.com/infobloxopen/protoc-gen-atlas-validate && dep ensure -vendor-only
-RUN go install github.com/infobloxopen/protoc-gen-atlas-validate
+RUN cd ${GOPATH}/src/github.com/tiny911/protoc-gen-atlas-validate && dep ensure -vendor-only
+RUN go install github.com/tiny911/protoc-gen-atlas-validate
 
 RUN mkdir -p /out/usr/bin
 
@@ -86,7 +84,7 @@ RUN go get github.com/go-openapi/spec && \
     rm -rf ${GOPATH}/src/github.com/grpc-ecosystem/ \
     && mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/ && \
     cd ${GOPATH}/src/github.com/grpc-ecosystem && \
-    git clone --single-branch -b atlas-patch https://github.com/infobloxopen/grpc-gateway.git && \
+    git clone https://github.com/grpc-ecosystem/grpc-gateway.git && \
     cd grpc-gateway/protoc-gen-swagger && go build -o /out/usr/bin/protoc-gen-swagger main.go
 
 RUN mkdir -p /out/protos && \
@@ -115,11 +113,9 @@ ENTRYPOINT ["protoc", "-I.", \
     # googleapis proto files
     "-Igithub.com/googleapis/googleapis", \
     # required import paths for protoc-gen-gorm plugin
-    "-Igithub.com/infobloxopen/protoc-gen-gorm", \
+    "-Igithub.com/tiny911/protoc-gen-gorm", \
     # required import paths for protoc-gen-atlas-query-validate plugin
-    "-Igithub.com/infobloxopen/protoc-gen-atlas-query-validate", \
-    # required import paths for protoc-gen-preprocess plugin
-    "-Igithub.com/infobloxopen/protoc-gen-preprocess", \
+    "-Igithub.com/tiny911/protoc-gen-atlas-query-validate", \
     # required import paths for protoc-gen-atlas-validate plugin
-    "-Igithub.com/infobloxopen/protoc-gen-atlas-validate" \
+    "-Igithub.com/tiny911/protoc-gen-atlas-validate" \
     ]

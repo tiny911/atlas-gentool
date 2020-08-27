@@ -5,8 +5,9 @@ This repository provides the Docker image used to generate the Go source code fr
 ## Build
 
 Build of the Docker image requires [docker](https://docs.docker.com/engine/installation/)
-engine and ```make``` utility as pre-requisites. As the requirements are satisfied, use the
-following command to compile the ```latest``` version of the Docker image:
+engine and `make` utility as pre-requisites. As the requirements are satisfied, use the
+following command to compile the `latest` version of the Docker image:
+
 ```sh
 make latest
 ```
@@ -23,7 +24,6 @@ where
 
 **NOTE** It is supposed that your proto schema has proper `option go_package` set.
 E.g: `option go_package = "github.com/{your_repo}/{your_app}"`
-
 
 ```sh
 docker run --rm -v $(pwd):/go/src/${project} \
@@ -49,7 +49,6 @@ docker run --rm -v $(pwd):/go/src/${project} \
 - protoc-gen-gorm (**Infoblox Open**)
 - protoc-gen-atlas-query-validate (**Infoblox Open**)
 - protoc-gen-atlas-validate (**Infoblox Open**)
-- protoc-gen-preprocess (**Infoblox Open**)
 
 ## protoc-gen-swagger patch
 

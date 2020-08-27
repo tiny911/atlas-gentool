@@ -4,7 +4,7 @@ IMAGE_NAME := infoblox/atlas-gentool
 
 GO_PATH              	:= /go
 SRCROOT_ON_HOST      	:= $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
-SRCROOT_IN_CONTAINER  := $(GO_PATH)/src/github.com/infobloxopen/atlas-gentool
+SRCROOT_IN_CONTAINER  := $(GO_PATH)/src/github.com/tiny911/atlas-gentool
 IMAGE_VERSION	        ?= $(shell git tag --points-at HEAD | sort -n -r | head -1)
 
 get_version = sed -n 's/^$(1)=//p' plugin.version
@@ -13,7 +13,6 @@ AATVersion   ?= $(shell $(call get_version,atlas-app-toolkit))
 PGGVersion   ?= $(shell $(call get_version,protoc-gen-gorm))
 PGAQVVersion ?= $(shell $(call get_version,protoc-gen-atlas-query-validate))
 PGAVVersion  ?= $(shell $(call get_version,protoc-gen-atlas-validate))
-PGPVersion   ?= $(shell $(call get_version,protoc-gen-preprocess))
 
 .PHONY: all
 all: latest
@@ -30,7 +29,6 @@ versioned:
 	 --build-arg PGG_VERSION=$(PGGVersion) \
 	 --build-arg PGAQV_VERSION=$(PGAQVVersion) \
 	 --build-arg PGAV_VERSION=$(PGAVVersion) \
-	 --build-arg PGP_VERSION=$(PGPVersion) \
 	 -t $(IMAGE_NAME):$(IMAGE_VERSION) .
 	docker tag $(IMAGE_NAME):$(IMAGE_VERSION) $(IMAGE_NAME):latest
 
@@ -52,7 +50,7 @@ test-gen:
 	--atlas-query-validate_out=. \
 	--atlas-validate_out=. \
 	--preprocess_out=. \
-	--swagger_out=:. github.com/infobloxopen/atlas-gentool/testdata/test.proto
+	--swagger_out=:. github.com/tiny911/atlas-gentool/testdata/test.proto
 
 test-check:
 	test -e testdata/test.pb.go
